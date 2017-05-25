@@ -23,6 +23,7 @@ game new_game(uint8_t players) {
     if (res->secret_map == NULL) {
         destroy_game(res); return NULL;
     }
+    memset(res->map->items, 1, 4); // put in some torches
     res->secret_map->description = "Now you stand atop the world turtle. To your north, east, south, and west are four elephants, upon the backs of which a gigantic flat disc is supported. There is nowhere to go from here. It's turtles all the way down.";
     res->players = players;
     switch(players) {

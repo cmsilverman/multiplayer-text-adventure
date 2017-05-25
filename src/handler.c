@@ -45,14 +45,46 @@ int handle_look(game g, uint8_t p, message m) {
     if (strcmp("look", m->command)) {
         // TODO look for additional params or whatever0
     }
-    if (g->map == NULL) {
+    map the_map = g->map;
+    if (the_map == NULL) {
         return 0;
     }
-    message reply = new_msg(m->command, (g->map)->description);
+    message reply = new_msg(m->command, the_map->description);
     if (reply == NULL) {
         return 2;
     }
-    broadcast_message(g, reply);
+    send_message(g, p, reply);
+    free(reply);
+    reply = new_msg(NULL, "exits:");
+    if (reply == NULL) {
+        return 2;
+    }
+    map *neighb = the_map->neighbors;
+    uint8_t it;
+    for (it = 0; it < 4; ++it) {
+        if (*neighb == NULL) {
+            break;
+        }
+        add_param(reply, direction_from_num(it));
+        ++neighb;
+    }
+    send_message(g, p, reply);
+    free(reply);
+    reply = new_msg(NULL, "items:");
+    if (reply == NULL) {
+        return 2;
+    }
+    uint8_t *item = the_map->items;
+    for (it = 0; it < MAX_ROOM_ITEMS; ++it) {
+        if (*item == 0) {
+            break;
+        }
+        if (*item != NUM_ITEM_TYPES + 1) {
+            add_param(reply, itemn_to_string(*item));
+        }
+        ++item;
+    }
+    send_message(g, p, reply);
     free(reply);
     return 0;
 }
@@ -118,7 +150,9 @@ int attempt_move(game g, uint8_t p, message m, uint8_t direction) {
     if (direction == XYZZY) {
         g->map = g->secret_map;
         // TODO
-        handle_look(g, p, m);
+        for (i = 0; i < g->players; ++i) {
+            handle_look(g, i, m);
+        }
         return 0;
     }
     map new_map = starting_map->neighbors[direction - 1];
@@ -127,7 +161,9 @@ int attempt_move(game g, uint8_t p, message m, uint8_t direction) {
         g->directions[i] = 0;
     }
     if (__atomic_compare_exchange_n(&g->map, &starting_map, new_map, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
-        handle_look(g, p, m);
+        for (i = 0; i < g->players; ++i) {
+            handle_look(g, i, m);
+        }
         return 0;
     }
     return 0;

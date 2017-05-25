@@ -2,6 +2,7 @@
 #define MAP_H_
 
 #include <stdint.h>
+#include "item.h"
 
 #define NO_MOVE 0
 #define NORTH 1
@@ -19,6 +20,7 @@ typedef struct map_tile {
      */
     struct map_tile *neighbors[4]; // null for not-an-exit
     volatile uint8_t locked[4]; // if the door currently needs a key
+    uint8_t items[MAX_ROOM_ITEMS];
 //    volatile uint8_t open[4]; // if people can go through the door at all
     char *description;
 } map_tile, *map;

@@ -4,6 +4,9 @@
 #include <sys/socket.h>
 #include <ctype.h>
 #include <errno.h>
+
+#include "item.h"
+#include "map.h"
 #include "utils.h"
 
 long get_number_from_stdin() {
@@ -267,11 +270,12 @@ int kill_player(game g, uint8_t p) {
     if (i) {
         return 1;
     }
-    i = p;
+    i = g->player_indices[p];
     while (g->leader[i] != i) {
         i = g->leader[i];
     }
     // give this person's characters to P1
+    printf("DEBUG. i = %u\n", i);
     g->leader[i] = 0;
     return 0;
 }
@@ -322,4 +326,20 @@ uint8_t get_chars_leader(game g, uint8_t character) {
         res = g->leader[res];
     }
     return res;
+}
+
+char *direction_from_num(uint8_t num) {
+    switch(num) {
+        case NORTH: 
+            return "north";
+        case SOUTH:
+            return "south";
+        case EAST:
+            return "east";
+        case WEST:
+            return "west";
+        default:
+            break;
+    }
+    return NULL;
 }

@@ -19,7 +19,7 @@
 #include "message.h"
 #include "utils.h"
 
-#define MY_PORT "42069"
+#define MY_PORT "42068"
 #define BACKUP_PORT "42068"
 #define BIGGISH_NUMBER 50
 #define BACKLOG 20

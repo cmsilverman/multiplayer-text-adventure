@@ -2,6 +2,7 @@
 #define GAME_H_
 
 #include <stdint.h>
+#include "item.h"
 #include "map.h"
 
 typedef struct {
@@ -19,6 +20,7 @@ typedef struct {
     uint8_t player_indices[4];
     volatile int8_t directions[4]; // 0 for not moving, which it usually is
     char *names[4];
+    volatile uint8_t items[4];
     volatile uint8_t keys[4]; // number of keys per player. maybe capped at one?
 } game_struct, *game;
 

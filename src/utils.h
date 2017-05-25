@@ -55,4 +55,6 @@ uint8_t get_current_leader(game g, uint8_t player);
 
 uint8_t get_chars_leader(game g, uint8_t character);
 
+char *direction_from_num(uint8_t num);
+
 #endif

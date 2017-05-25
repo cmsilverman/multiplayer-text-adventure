@@ -9,6 +9,7 @@ map new_map() {
         return NULL;
     }
     memset(res, 0, sizeof(map_tile));
+    res->description = "a plain room";
     return res;
 }
 
