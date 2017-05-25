@@ -33,7 +33,14 @@
 int play_game(game g, pthread_t *threads) {
     char *inp;
     message m;
-    while(1) {
+    int i = 1;
+    m = new_msg(NULL, "look");
+    if (m == NULL) {
+        i = 0;
+    }
+    handle_command(g, 0, m);
+    free(m);
+    while(i) {
         inp = get_one_stdin_line();
         if (inp == NULL) {
             break;
@@ -50,7 +57,6 @@ int play_game(game g, pthread_t *threads) {
         free(m);
     }
     // TODO kill threads, close sockets
-    int i;
     if (g->players > 1) {
         printf("You can hit ctrl-c now, or wait for other players to acknowledge the quit, if necessary\n");
     }
@@ -89,6 +95,12 @@ void *interact_with_remote(void *arg) {
         return NULL; // uh oh
     }
     send_message(g, player_num, msg);
+    free(msg);
+    msg = new_msg("Welcome!", "look");
+    if (msg == NULL) {
+        return NULL; // uh oh
+    }
+    handle_command(g, player_num, msg);
     free(msg);
     char *buf = (char*)malloc(BUF_SIZE * sizeof(char));
     if (buf == NULL) {
