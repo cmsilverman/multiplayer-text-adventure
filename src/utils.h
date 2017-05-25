@@ -45,4 +45,14 @@ void send_message(game g, uint8_t p, message msg);
 
 void broadcast_message(game g, message msg);
 
+int kill_player(game g, uint8_t p);
+
+char *pnum_to_string(uint8_t digit);
+
+char *cnum_to_string(uint8_t digit);
+
+uint8_t get_current_leader(game g, uint8_t player);
+
+uint8_t get_chars_leader(game g, uint8_t character);
+
 #endif

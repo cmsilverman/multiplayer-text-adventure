@@ -167,7 +167,7 @@ char *receive_input(int sockfd, char* buf) {
     }
     size_t bytes_received = recv(sockfd, buf + current_length,
         LONGLINE_SIZE - current_length, 0);
-    if (!bytes_received) {
+    if (!bytes_received || bytes_received == -1) {
         return NULL;
     }
     char *message_end = strstr(buf, "\r\n");
@@ -257,4 +257,69 @@ message stdin_message() {
     message m = parse_message(txt);
     free(txt);
     return m;
+}
+
+int kill_player(game g, uint8_t p) {
+    if (p == 0) {
+        return -1; // too much to do
+    }
+    uint8_t i = __atomic_exchange_n(&g->dqed[p], 1, __ATOMIC_SEQ_CST);
+    if (i) {
+        return 1;
+    }
+    i = p;
+    while (g->leader[i] != i) {
+        i = g->leader[i];
+    }
+    // give this person's characters to P1
+    g->leader[i] = 0;
+    return 0;
+}
+
+char *pnum_to_string(uint8_t digit) {
+    switch(digit) {
+        case 0:
+            return "P1";
+        case 1:
+            return "P2";
+        case 2:
+            return "P3";
+        case 3:
+            return "P4";
+        default:
+            break;
+    }
+    return NULL;
+}
+
+char *cnum_to_string(uint8_t digit) {
+    switch(digit) {
+        case 0:
+            return "Green";
+        case 1:
+            return "Red";
+        case 2:
+            return "Blue";
+        case 3:
+            return "Pink";
+        default:
+            break;
+    }
+    return NULL;
+}
+
+uint8_t get_current_leader(game g, uint8_t player) {
+    uint8_t res = g->player_indices[player];
+    while (g->leader[res] != res) {
+        res = g->leader[res];
+    }
+    return res;
+}
+
+uint8_t get_chars_leader(game g, uint8_t character) {
+    uint8_t res = character;
+    while (g->leader[res] != res) {
+        res = g->leader[res];
+    }
+    return res;
 }

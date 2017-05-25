@@ -37,13 +37,15 @@ game new_game(uint8_t players) {
             res->leader[2] = 2;
             res->leader[3] = 3;
             break;
-        default: // case 4
+        case 4:
             res->player_indices[1] = 1;
             res->player_indices[2] = 2;
             res->player_indices[3] = 3;
             res->leader[1] = 1;
             res->leader[2] = 2;
             res->leader[3] = 3;
+            break;
+        default:
             break;
     }
     return res;

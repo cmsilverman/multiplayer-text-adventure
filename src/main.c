@@ -15,6 +15,7 @@
 
 #include "dispatch.h"
 #include "game.h"
+#include "handler.h"
 #include "message.h"
 #include "utils.h"
 
@@ -38,13 +39,27 @@ int play_game(game g, pthread_t *threads) {
             break;
         }
         m = parse_message(inp);
+        free(inp);
         if (m == NULL) {
             continue;
         }
-        handle_command(g, 0, m); // g0m, like the fyad guy
+        if (m->command != NULL && strlen(m->command) == 4 && strcmp("quit", m->command) == 0) {
+            break;
+        }
+        handle_command(g, 0, m); // g0m. like the fyad guy
         free(m);
     }
     // TODO kill threads, close sockets
+    int i;
+    if (g->players > 1) {
+        printf("You can hit ctrl-c now, or wait for other players to acknowledge the quit, if necessary\n");
+    }
+    for (i = 0; i < g->players - 1; ++i) {
+        close(g->sockets[i]);
+    }
+    for (i = 0; i < g->players - 1; ++i) {
+        pthread_join(threads[i], NULL);
+    }
     return 0;
 }
 
@@ -52,6 +67,7 @@ int play_single() {
     char *name = get_username();
     game g = new_game(1);
     g->names[0] = name;
+    printf("Ready to begin!\n");
     play_game(g, NULL);
     return 0;
 }
@@ -62,6 +78,18 @@ void *interact_with_remote(void *arg) {
     game g = ig->g;
     int sockfd = g->sockets[i];
     uint8_t player_num = i+1;
+    message msg = new_msg(pnum_to_string(player_num), "That's you.");
+    if (msg == NULL) {
+        return NULL; // uh oh
+    }
+    send_message(g, player_num, msg);
+    free(msg);
+    msg = new_msg(cnum_to_string(g->player_indices[player_num]), "That's the character you currently control.");
+    if (msg == NULL) {
+        return NULL; // uh oh
+    }
+    send_message(g, player_num, msg);
+    free(msg);
     char *buf = (char*)malloc(BUF_SIZE * sizeof(char));
     if (buf == NULL) {
         return NULL; // error
@@ -72,7 +100,7 @@ void *interact_with_remote(void *arg) {
         if (inp == NULL) {
             break;
         }
-        message msg = parse_message(inp);
+        msg = parse_message(inp);
         free(inp);
         if (msg == NULL) {
             continue; // try again
@@ -80,8 +108,7 @@ void *interact_with_remote(void *arg) {
         handle_command(g, player_num, msg);
         destroy_message(msg);
     }
-    // TODO redistribute units
-    close(sockfd);
+    printf("%s (%s) is out and you get their stuff.\n", g->names[player_num], pnum_to_string(player_num));
     return NULL;
 }
 
@@ -239,6 +266,7 @@ void *output_loop(void *arg) {
         printf("%s\n", output);
         free(output);
     }
+    printf("It looks like we've been disconnected. Maybe type a couple newlines?\n");
     return NULL;
 }
 

@@ -14,6 +14,29 @@
 #include "utils.h"
 
 int handle_quit(game g, uint8_t p, message m) {
+    if (p == 0) {
+        return 0;
+    }
+    if (!kill_player(g, p)) {
+        close(g->sockets[p-1]);
+        message reply = new_msg(pnum_to_string(p), "*quits the game*");
+        if (reply == NULL) {
+            return 2;
+        }
+        broadcast_message(g, reply);
+        free(reply);
+    }
+    return 0;
+}
+
+int handle_commands(game g, uint8_t p, message m) {
+    char *body = "quit, commands, look, north, south, east, west";
+    message reply = new_msg(m->command, body);
+    if (reply == NULL) {
+        return 2;
+    }
+    send_message(g, p, reply);
+    free(reply);
     return 0;
 }
 
@@ -26,6 +49,9 @@ int handle_look(game g, uint8_t p, message m) {
         return 0;
     }
     message reply = new_msg(m->command, (g->map)->description);
+    if (reply == NULL) {
+        return 2;
+    }
     broadcast_message(g, reply);
     free(reply);
     return 0;
@@ -121,6 +147,31 @@ int handle_west(game g, uint8_t p, message m) {
 }
 int handle_xyzzy(game g, uint8_t p, message m) {
     return attempt_move(g, p, m, XYZZY);
+}
+
+int handle_switch(game g, uint8_t p, message m) {
+    uint8_t start = get_current_leader(g, p);
+    uint8_t next = start + 1;
+    if (next == 4) {
+        next = 0;
+    }
+    while (next != start) {
+        if (get_chars_leader(g, next) == start) {
+            g->leader[next] = next;
+            g->leader[start] = next;
+            break;
+        }
+        ++next;
+        if (next == 4) {
+            next = 0;
+        }
+    }
+    message reply = new_msg(m->command, cnum_to_string(next));
+    if (reply == NULL) {
+        return 2;
+    }
+    send_message(g, p, reply);
+    return 0;
 }
 
 int handle_ERR_UNKNOWNCOMMAND(game g, uint8_t p, message m) {

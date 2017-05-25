@@ -11,7 +11,7 @@
  * Number of handler entries in handlers[]
  * Do NOT include the default handler entry in here
  */
-#define NUM_HANDLER_ENTRIES 7
+#define NUM_HANDLER_ENTRIES 9
 
 typedef int (*handler_function)(game g, uint8_t p, message m);
 
@@ -25,7 +25,7 @@ struct handler_entry {
 struct handler_entry handlers[] = {
     // most basic stuff
     HANDLER_ENTRY(quit), // 1
-    HANDLER_ENTRY(look), // 2
+    HANDLER_ENTRY(commands), // 2
 
     // movement
     HANDLER_ENTRY(north), // 3
@@ -33,6 +33,10 @@ struct handler_entry handlers[] = {
     HANDLER_ENTRY(east), // 5
     HANDLER_ENTRY(west), // 6
     HANDLER_ENTRY(xyzzy), // 7
+
+    // etc
+    HANDLER_ENTRY(look), // 8
+    HANDLER_ENTRY(switch), // 9 - ignore the syntax highlighting if you see it
 
     /* default */
     HANDLER_ENTRY(ERR_UNKNOWNCOMMAND)
