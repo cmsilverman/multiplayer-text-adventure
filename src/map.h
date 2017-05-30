@@ -21,6 +21,7 @@ typedef struct map_tile {
     struct map_tile *neighbors[4]; // null for not-an-exit
     volatile uint8_t locked[4]; // if the door currently needs a key
     uint8_t items[MAX_ROOM_ITEMS];
+    uint8_t dark;
 //    volatile uint8_t open[4]; // if people can go through the door at all
     char *description;
 } map_tile, *map;

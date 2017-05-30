@@ -296,6 +296,13 @@ char *pnum_to_string(uint8_t digit) {
     return NULL;
 }
 
+char *pnum_to_username(game g, uint8_t digit) {
+    if (digit > g->players) {
+        return NULL;
+    }
+    return g->names[digit];
+}
+
 char *cnum_to_string(uint8_t digit) {
     switch(digit) {
         case 0:

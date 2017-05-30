@@ -21,7 +21,7 @@ void destroy_map(map m) {
 }
 
 void set_neighbor(map m, map n, uint8_t direction) {
-    m->neighbors[direction] = n;
+    m->neighbors[direction - 1] = n;
 }
 
 void set_description(map m, char *desc) {

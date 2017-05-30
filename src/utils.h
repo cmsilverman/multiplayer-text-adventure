@@ -49,6 +49,8 @@ int kill_player(game g, uint8_t p);
 
 char *pnum_to_string(uint8_t digit);
 
+char *pnum_to_username(game g, uint8_t digit);
+
 char *cnum_to_string(uint8_t digit);
 
 uint8_t get_current_leader(game g, uint8_t player);
