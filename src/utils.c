@@ -275,7 +275,7 @@ int kill_player(game g, uint8_t p) {
         i = g->leader[i];
     }
     // give this person's characters to P1
-    printf("DEBUG. i = %u\n", i);
+//    printf("DEBUG. i = %u\n", i);
     g->leader[i] = 0;
     return 0;
 }
