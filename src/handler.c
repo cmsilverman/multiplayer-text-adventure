@@ -31,6 +31,7 @@ int handle_quit(game g, uint8_t p, message m) {
 }
 
 int handle_commands(game g, uint8_t p, message m) {
+    g->directions[p] = 0;
     char *body = "quit, commands, shout, look, north, south, east, west, switch, take, drop";
     message reply = new_msg(m->command, body);
     if (reply == NULL) {
@@ -212,6 +213,7 @@ int handle_xyzzy(game g, uint8_t p, message m) {
 }
 
 int handle_switch(game g, uint8_t p, message m) {
+    g->directions[p] = 0;
     uint8_t start = get_current_leader(g, p);
     uint8_t next = start + 1;
     if (next == 4) {
@@ -237,6 +239,7 @@ int handle_switch(game g, uint8_t p, message m) {
 }
 
 int handle_take(game g, uint8_t p, message m) {
+    g->directions[p] = 0;
     message reply;
     if (num_params(m) < 1) {
         reply = new_msg(m->command, "You need to tell me which item to take");
@@ -298,6 +301,7 @@ int handle_take(game g, uint8_t p, message m) {
 }
 
 int handle_drop(game g, uint8_t p, message m) {
+    g->directions[p] = 0;
     map the_map = g->map;
     message reply;
     uint8_t character = get_current_leader(g, p);
